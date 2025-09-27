@@ -4,7 +4,7 @@
   "description": "Annual Classic Car Show 2024 - Nuxt.js Web Application",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
+    "build": "nuxt generate",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",

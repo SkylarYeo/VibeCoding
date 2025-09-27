@@ -29,13 +29,8 @@ export default defineNuxtConfig({
     '~/assets/css/main.css'
   ],
 
-  // Server-side rendering configuration
-  ssr: true,
-
-  // Nitro configuration for API routes
+  // Static site generation for Netlify
   nitro: {
-    experimental: {
-      wasm: true
-    }
+    preset: 'netlify'
   }
 })
