@@ -2,17 +2,29 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   
+  // Runtime config for environment variables
+  runtimeConfig: {
+    // Private keys (only available on server-side)
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseKey: process.env.SUPABASE_KEY,
+    // Public keys (exposed to client-side)
+    public: {
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabaseKey: process.env.SUPABASE_KEY
+    }
+  },
+  
   // Global page headers
   app: {
     head: {
-      title: 'Annual Classic Car Show 2024',
+      title: 'Annual Classic Car Show 2025',
       htmlAttrs: {
         lang: 'en'
       },
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { hid: 'description', name: 'description', content: 'Experience the finest collection of vintage and classic automobiles at the Annual Classic Car Show 2024.' }
+        { hid: 'description', name: 'description', content: 'Experience the finest collection of vintage and classic automobiles at the Annual Classic Car Show 2025.' }
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },

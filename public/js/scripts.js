@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Contact Form Submission
+    // Contact Form Submission with Supabase
     const contactForm = document.querySelector('.contact-form');
     if (contactForm) {
         contactForm.addEventListener('submit', async function(e) {
@@ -238,22 +238,31 @@ document.addEventListener('DOMContentLoaded', function() {
             const subject = this.querySelector('input[name="subject"]').value;
             const message = this.querySelector('textarea[name="message"]').value;
             
+            // Validate required fields
+            if (!name || !email || !subject || !message) {
+                showNotification('All fields are required', 'error');
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+            
             try {
-                const response = await fetch('/api/contact', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ name, email, subject, message })
+                // Use Supabase helper from global scope
+                const { data, error } = await window.supabaseHelpers.submitContact({
+                    name, email, subject, message
                 });
                 
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification(result.message, 'success');
-                    this.reset();
-                } else {
+                if (error) {
+                    console.error('Supabase error:', error);
                     showNotification('Error sending message. Please try again.', 'error');
+                } else {
+                    showNotification('Thank you for your message! We\'ll get back to you soon.', 'success');
+                    this.reset();
                 }
             } catch (error) {
                 console.error('Error submitting contact form:', error);
@@ -262,40 +271,43 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Newsletter Subscription
+    // Newsletter Subscription with Supabase
     const newsletterForm = document.querySelector('.newsletter');
     if (newsletterForm) {
         newsletterForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = this.querySelector('input[type="email"]').value;
             
-            if (email) {
-                try {
-                    const response = await fetch('/api/newsletter', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        showNotification(result.message, 'success');
-                        this.querySelector('input[type="email"]').value = '';
-                    } else {
-                        showNotification('Error subscribing. Please try again.', 'error');
-                    }
-                } catch (error) {
-                    console.error('Error subscribing to newsletter:', error);
+            if (!email) {
+                showNotification('Please enter an email address', 'error');
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            try {
+                const { data, error } = await window.supabaseHelpers.subscribeNewsletter(email);
+                
+                if (error) {
+                    console.error('Supabase newsletter error:', error);
                     showNotification('Error subscribing. Please try again.', 'error');
+                } else {
+                    showNotification('Successfully subscribed to our newsletter!', 'success');
+                    this.querySelector('input[type="email"]').value = '';
                 }
+            } catch (error) {
+                console.error('Error subscribing to newsletter:', error);
+                showNotification('Error subscribing. Please try again.', 'error');
             }
         });
     }
 
-    // Ticket Selection
+    // Ticket Selection with Supabase
     const ticketButtons = document.querySelectorAll('.ticket-btn');
     ticketButtons.forEach(button => {
         button.addEventListener('click', async function() {
@@ -304,27 +316,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const price = ticketCard.querySelector('.price').textContent;
             
             try {
-                const response = await fetch('/api/tickets', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ ticketType, price })
+                const { data, error } = await window.supabaseHelpers.purchaseTicket({
+                    ticketType,
+                    price
                 });
                 
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification(result.message, 'info');
+                if (error) {
+                    console.error('Supabase ticket error:', error);
+                    showNotification('Error processing ticket selection. Please try again.', 'error');
+                } else {
+                    showNotification(`Selected: ${ticketType} - ${price}. Redirecting to checkout...`, 'info');
                     
                     // Simulate redirect to checkout
                     setTimeout(() => {
                         console.log('Redirecting to checkout page...');
                         // In a real application, you would redirect to the actual checkout URL
-                        // window.location.href = result.redirectUrl;
+                        // window.location.href = '/checkout';
                     }, 2000);
-                } else {
-                    showNotification('Error processing ticket selection. Please try again.', 'error');
                 }
             } catch (error) {
                 console.error('Error selecting ticket:', error);
