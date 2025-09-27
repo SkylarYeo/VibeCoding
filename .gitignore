@@ -47,6 +47,10 @@ jspm_packages/
 # dotenv environment variables file
 .env
 
+# Nuxt.js build / generate output
+.nuxt
+.output
+
 # IDE files
 .vscode/
 .idea/
